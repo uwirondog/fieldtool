@@ -40,8 +40,9 @@ lv_obj_set_style_text_opa(ui_LabelCameraShotTitle, 255, LV_PART_MAIN| LV_STATE_D
 lv_obj_set_style_text_font(ui_LabelCameraShotTitle, &lv_font_montserrat_38, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_ImageCameraShotImage = lv_canvas_create(ui_ScreenCameraShot);
-lv_obj_set_height( ui_ImageCameraShotImage, 720);
-lv_obj_set_width( ui_ImageCameraShotImage, 1280);
+// lv_obj_set_height( ui_ImageCameraShotImage, 1280);
+// lv_obj_set_width( ui_ImageCameraShotImage, 800);
+lv_obj_set_size(ui_ImageCameraShotImage,798,1239);
 lv_obj_set_align( ui_ImageCameraShotImage, LV_ALIGN_CENTER );
 lv_obj_add_flag( ui_ImageCameraShotImage, LV_OBJ_FLAG_ADV_HITTEST );   /// Flags
 lv_obj_clear_flag( ui_ImageCameraShotImage, LV_OBJ_FLAG_SCROLLABLE );    /// Flags

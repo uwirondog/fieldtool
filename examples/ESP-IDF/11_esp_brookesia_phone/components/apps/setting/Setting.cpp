@@ -40,7 +40,7 @@
 #define WIFI_CONNECT_UI_PANEL_SIZE      (1 * 1000)
 #define WIFI_CONNECT_RET_WAIT_TIME_MS   (10 * 1000)
 
-#define SCREEN_BRIGHTNESS_MIN           (0)
+#define SCREEN_BRIGHTNESS_MIN           (20)
 #define SCREEN_BRIGHTNESS_MAX           (BSP_LCD_BACKLIGHT_BRIGHTNESS_MAX)
 
 #define SPEAKER_VOLUME_MIN              (0)

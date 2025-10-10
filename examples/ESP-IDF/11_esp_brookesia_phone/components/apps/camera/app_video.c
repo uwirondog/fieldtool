@@ -43,6 +43,7 @@ typedef struct {
 } app_video_t;
 
 static app_video_t app_camera_video;
+static inline esp_err_t video_stream_start(int video_fd);
 
 esp_err_t app_video_main(i2c_master_bus_handle_t i2c_bus_handle)
 {
@@ -89,7 +90,7 @@ int app_video_open(char *dev, video_fmt_t init_fmt)
     struct v4l2_ext_control control[1];
 #endif
 
-    int fd = open(dev, O_RDONLY);
+    int fd = open(dev, O_RDONLY | O_NONBLOCK, 0);
     if (fd < 0) {
         ESP_LOGE(TAG, "Open video failed");
         return -1;
@@ -132,6 +133,7 @@ int app_video_open(char *dev, video_fmt_t init_fmt)
             goto exit_0;
         }
     }
+    ESP_LOGI(TAG,"app_video_open successful");
 
 #if CONFIG_EXAMPLE_ENABLE_CAM_SENSOR_PIC_VFLIP
     controls.ctrl_class = V4L2_CTRL_CLASS_USER;
@@ -255,6 +257,7 @@ uint32_t app_video_get_buf_size(void)
     return buf_size;
 }
 
+int vedio_stream_iii = 0;
 static inline esp_err_t video_receive_video_frame(int video_fd)
 {
     memset(&app_camera_video.v4l2_buf, 0, sizeof(app_camera_video.v4l2_buf));
@@ -262,6 +265,7 @@ static inline esp_err_t video_receive_video_frame(int video_fd)
     app_camera_video.v4l2_buf.memory = app_camera_video.camera_mem_mode;
 
     int res = ioctl(video_fd, VIDIOC_DQBUF, &(app_camera_video.v4l2_buf));
+    // ESP_LOGI(TAG,"res = %d",res);
     if (res != 0) {
         ESP_LOGE(TAG, "failed to receive video frame");
         goto errout;
@@ -348,6 +352,7 @@ static void video_stream_task(void *arg)
     int video_fd = *((int *)arg);
 
     while (1) {
+        
         ESP_ERROR_CHECK(video_receive_video_frame(video_fd));
 
         video_operation_video_frame(video_fd);
@@ -356,6 +361,7 @@ static void video_stream_task(void *arg)
 
         if(xEventGroupGetBits(app_camera_video.video_event_group) & VIDEO_TASK_DELETE) {
             xEventGroupClearBits(app_camera_video.video_event_group, VIDEO_TASK_DELETE);
+            ESP_LOGI(TAG,"stop stream");
             ESP_ERROR_CHECK(video_stream_stop(video_fd));
             vTaskDelete(NULL);
         }
