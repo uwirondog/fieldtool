@@ -86,7 +86,7 @@ extern "C" void app_main(void)
     assert(game_2048 != nullptr && "Failed to create game_2048");
     assert((phone->installApp(game_2048) >= 0) && "Failed to begin game_2048");
 
-    Camera *camera = new Camera(1280, 720);
+    Camera *camera = new Camera(1280, 800);
     assert(camera != nullptr && "Failed to create camera");
     assert((phone->installApp(camera) >= 0) && "Failed to begin camera");
 

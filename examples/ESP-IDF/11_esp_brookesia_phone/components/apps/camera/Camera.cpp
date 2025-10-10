@@ -166,7 +166,7 @@ bool Camera::run(void)
     lv_obj_set_style_text_font(btn_label, &lv_font_montserrat_16, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_label_set_text(btn_label, "  Normal \n   Detect");
     lv_obj_set_style_text_color(btn_label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_align(mode_switch_btn, LV_ALIGN_TOP_RIGHT, -150, 0);
+    lv_obj_align(mode_switch_btn, LV_ALIGN_TOP_RIGHT, -50, 0);
     lv_obj_add_event_cb(mode_switch_btn, [](lv_event_t *e) {
         Camera *camera = (Camera *)e->user_data;
 

@@ -26,7 +26,7 @@ extern "C" {
 #define CODEC_DEFAULT_VOLUME                (60)
 
 #define BSP_LCD_BACKLIGHT_BRIGHTNESS_MAX    (95)
-#define BSP_LCD_BACKLIGHT_BRIGHTNESS_MIN    (0)
+#define BSP_LCD_BACKLIGHT_BRIGHTNESS_MIN    (20)
 #define LCD_LEDC_CH                         (CONFIG_BSP_DISPLAY_BRIGHTNESS_LEDC_CH)
 
 /**************************************************************************************************
