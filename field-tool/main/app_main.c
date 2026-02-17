@@ -9,6 +9,7 @@
 #include "app_config.h"
 #include "sdcard/sdcard_manager.h"
 #include "serial/serial_monitor.h"
+#include "wifi/wifi_manager.h"
 #include "ui/ui_manager.h"
 #include "ui/ui_home.h"
 
@@ -31,6 +32,9 @@ void app_main(void)
 
     /* Mount SD card (non-fatal if missing — needs LDO channel 4 internally) */
     sdcard_manager_init();
+
+    /* Initialize WiFi (C6 coprocessor via esp_hosted SDIO) */
+    wifi_mgr_init();
 
     /* Initialize display + touch via Waveshare BSP */
     ESP_LOGI(TAG, "Initializing display...");
@@ -65,8 +69,11 @@ void app_main(void)
 
     bsp_display_unlock();
 
-    /* Start serial monitor (USB Host + CH340 auto-detect) */
-    serial_monitor_init();
+    /* Start serial monitor (USB Host + CH340 auto-detect, non-fatal) */
+    ret = serial_monitor_init();
+    if (ret != ESP_OK) {
+        ESP_LOGW(TAG, "Serial monitor unavailable: %s", esp_err_to_name(ret));
+    }
 
     ESP_LOGI(TAG, "Field Tool ready. Touch the screen to navigate.");
     ESP_LOGI(TAG, "Plug a flowmeter into the USB-A port to monitor serial output.");

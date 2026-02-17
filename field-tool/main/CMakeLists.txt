@@ -12,6 +12,10 @@ set(SRCS
     "ui/ui_wifi_ap.c"
     "ui/ui_settings.c"
     "flasher/flasher_manager.c"
+    "flasher/flasher_port.c"
+    "flasher/efuse_burn.c"
+    "wifi/wifi_manager.c"
+    "wifi/firmware_download.c"
 )
 
 set(INCLUDE_DIRS

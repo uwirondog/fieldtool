@@ -18,6 +18,7 @@ typedef struct {
     uint8_t progress;         /* 0-100 */
     char status_msg[128];
     bool firmware_ready;      /* true if SD card has all 4 files */
+    bool key_ready;           /* true if encryption key is on SD card */
 } flasher_status_t;
 
 /**
@@ -27,12 +28,26 @@ typedef struct {
 bool flasher_check_firmware(void);
 
 /**
- * @brief Start the flash process (runs on a background task)
+ * @brief Check SD card for encryption key file
+ * @return true if /sdcard/keys/flash_encryption_key.bin exists and is 32 bytes
+ */
+bool flasher_check_encryption_key(void);
+
+/**
+ * @brief Flash an already-encrypted device (runs on a background task)
  *
- * Pauses serial monitor, opens CH340 via esp-serial-flasher USB port,
- * flashes all 4 binaries, then resumes serial monitor.
+ * Pauses serial monitor, connects via CH340, flashes all 4 binaries,
+ * resets target, then resumes serial monitor.
  */
 void flasher_start(void);
+
+/**
+ * @brief Flash a virgin/unencrypted device (runs on a background task)
+ *
+ * Full sequence: burn encryption key to eFuses → erase flash → flash
+ * all 4 binaries → reset. First boot auto-enables flash encryption.
+ */
+void flasher_start_virgin(void);
 
 /**
  * @brief Get current flasher status (thread-safe, polled by UI)

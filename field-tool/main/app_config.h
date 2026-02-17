@@ -26,12 +26,17 @@
 #define FT_FIRMWARE_DIR     FT_SD_MOUNT_POINT "/firmware"
 #define FT_LOGS_DIR         FT_SD_MOUNT_POINT "/logs"
 #define FT_CONFIG_DIR       FT_SD_MOUNT_POINT "/config"
+#define FT_ENCRYPTION_KEY   FT_SD_MOUNT_POINT "/keys/flash_encryption_key.bin"
 
 /* WiFi Hotspot */
 #define FT_WIFI_AP_SSID     "RCWM"
 #define FT_WIFI_AP_PASS     "testRCWM2026!"
 #define FT_WIFI_AP_MAX_CONN (4)
 #define FT_WIFI_AP_CHANNEL  (1)
+
+/* Firmware download — chemproject GCS bucket */
+#define FT_FW_CHECK_URL     "https://chemical-monitor-api-57459833175.us-central1.run.app/api/checkFirmwareUpdate"
+#define FT_FW_DEVICE_ID     "field-tool"
 
 /* App version */
 #define FT_APP_VERSION      "0.1.0"

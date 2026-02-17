@@ -2,6 +2,7 @@
 #include "log_parser.h"
 #include "log_storage.h"
 #include "app_config.h"
+#include "flasher_port.h"
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -57,7 +58,10 @@ static void ring_push(const log_entry_t *entry)
 
 static bool usb_rx_callback(const uint8_t *data, size_t data_len, void *arg)
 {
-    if (s_rx_stream != NULL) {
+    if (s_flasher_mode) {
+        /* Route data to flasher's RX buffer during flash operations */
+        flasher_port_feed_rx(data, data_len);
+    } else if (s_rx_stream != NULL) {
         xStreamBufferSendFromISR(s_rx_stream, data, data_len, NULL);
     }
     return true;
@@ -120,6 +124,9 @@ static void serial_rx_task(void *arg)
             if (c == '\n' || c == '\r') {
                 if (line_pos > 0) {
                     line_buf[line_pos] = '\0';
+
+                    /* Echo to debug log */
+                    ESP_LOGI(TAG, ">> %s", line_buf);
 
                     /* Parse the line */
                     log_parser_parse(line_buf, &entry);
@@ -234,10 +241,18 @@ esp_err_t serial_monitor_init(void)
         .skip_phy_setup = false,
         .intr_flags = ESP_INTR_FLAG_LEVEL1,
     };
-    ESP_ERROR_CHECK(usb_host_install(&host_config));
+    esp_err_t usb_err = usb_host_install(&host_config);
+    if (usb_err != ESP_OK) {
+        ESP_LOGE(TAG, "USB Host install failed: %s (not enough internal DMA memory?)", esp_err_to_name(usb_err));
+        return usb_err;
+    }
 
     /* Install CDC-ACM driver */
-    ESP_ERROR_CHECK(cdc_acm_host_install(NULL));
+    usb_err = cdc_acm_host_install(NULL);
+    if (usb_err != ESP_OK) {
+        ESP_LOGE(TAG, "CDC-ACM install failed: %s", esp_err_to_name(usb_err));
+        return usb_err;
+    }
 
     /* Initialize log storage (SD card writer) */
     log_storage_init();
@@ -324,21 +339,29 @@ void serial_monitor_pause(void)
     ESP_LOGI(TAG, "Pausing serial monitor for flasher...");
     s_flasher_mode = true;
 
-    /* Close current CDC device so flasher can open it */
-    if (s_cdc_dev != NULL) {
-        cdc_acm_host_close(s_cdc_dev);
-        s_cdc_dev = NULL;
+    /* Keep the CDC device open! The flasher will reuse it.
+     * Just stop the RX task from processing data by draining the stream buffer. */
+    if (s_rx_stream) {
+        xStreamBufferReset(s_rx_stream);
     }
-    s_device_connected = false;
 
     /* Give tasks time to notice the mode change */
     vTaskDelay(pdMS_TO_TICKS(200));
-    ESP_LOGI(TAG, "Serial monitor paused");
+    ESP_LOGI(TAG, "Serial monitor paused (device handle kept open)");
 }
 
 void serial_monitor_resume(void)
 {
     ESP_LOGI(TAG, "Resuming serial monitor...");
+    /* Reset RX stream so serial_rx_task starts clean */
+    if (s_rx_stream) {
+        xStreamBufferReset(s_rx_stream);
+    }
     s_flasher_mode = false;
-    /* connection_task will auto-reconnect on next iteration */
+    /* connection_task continues with the existing device */
+}
+
+void *serial_monitor_get_device(void)
+{
+    return (void *)s_cdc_dev;
 }

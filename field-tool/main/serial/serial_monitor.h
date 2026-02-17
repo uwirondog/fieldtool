@@ -55,14 +55,20 @@ uint32_t serial_monitor_get_total_lines(void);
 /**
  * @brief Pause the serial monitor for flashing
  *
- * Closes the USB CDC device so the flasher can open it.
- * The connection task stops scanning until resume is called.
+ * Stops processing serial data but keeps the USB CDC device open.
+ * Returns the device handle so the flasher can reuse it.
  */
 void serial_monitor_pause(void);
 
 /**
  * @brief Resume the serial monitor after flashing
  *
- * The connection task will automatically reconnect to the CH340.
+ * Restores serial data processing on the existing connection.
  */
 void serial_monitor_resume(void);
+
+/**
+ * @brief Get the CDC device handle (for flasher to reuse)
+ * Only valid after serial_monitor_pause() and before resume().
+ */
+void *serial_monitor_get_device(void);

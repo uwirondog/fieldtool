@@ -8,11 +8,11 @@ dependencies:
     version: "9.2.*"
     public: true
 
-  # WiFi via ESP32-C6 coprocessor (Phase 5 — re-enable when building hotspot)
-  # espressif/esp_wifi_remote:
-  #   version: "0.14.*"
-  # espressif/esp_hosted:
-  #   version: "1.4.*"
+  # WiFi via ESP32-C6 coprocessor
+  espressif/esp_wifi_remote:
+    version: "0.14.*"
+  espressif/esp_hosted:
+    version: "1.4.*"
 
   # Serial flasher (esptool protocol in C)
   espressif/esp-serial-flasher:
