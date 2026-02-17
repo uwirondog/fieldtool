@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 static const char *TAG = "FLASHER";
 
@@ -266,12 +267,27 @@ bool flasher_check_firmware(void)
     struct stat st;
     bool all_ok = true;
 
+    /* Debug: list what's actually in the firmware directory */
+    ESP_LOGI(TAG, "Checking firmware dir: %s", FT_FIRMWARE_DIR);
+    DIR *dir = opendir(FT_FIRMWARE_DIR);
+    if (dir) {
+        struct dirent *ent;
+        while ((ent = readdir(dir)) != NULL) {
+            ESP_LOGI(TAG, "  Found: %s", ent->d_name);
+        }
+        closedir(dir);
+    } else {
+        ESP_LOGW(TAG, "Cannot open firmware dir: %s", FT_FIRMWARE_DIR);
+    }
+
     for (int i = 0; i < NUM_BINS; i++) {
         char path[128];
         snprintf(path, sizeof(path), "%s/%s", FT_FIRMWARE_DIR, s_bins[i].filename);
         if (stat(path, &st) != 0) {
             ESP_LOGW(TAG, "Missing: %s", path);
             all_ok = false;
+        } else {
+            ESP_LOGI(TAG, "OK: %s (%ld bytes)", path, (long)st.st_size);
         }
     }
 

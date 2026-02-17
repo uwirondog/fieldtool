@@ -47,6 +47,10 @@ CONFIG_IDF_EXPERIMENTAL_FEATURES=y
 # GigaDevice flash support (silence warnings)
 CONFIG_SPI_FLASH_SUPPORT_GD_CHIP=y
 
+# FAT filesystem — enable long filenames
+CONFIG_FATFS_LFN_HEAP=y
+CONFIG_FATFS_MAX_LFN=255
+
 # Serial flasher — USB CDC-ACM interface (flash via CH340 USB bridge)
 CONFIG_SERIAL_FLASHER_INTERFACE_USB=y
 CONFIG_SERIAL_FLASHER_MD5_ENABLED=y
